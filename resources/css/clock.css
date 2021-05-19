@@ -1,0 +1,30 @@
+.clock *:not(.date){
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.clock .date{
+    font-size: 2.5rem;
+    color: rgb(102, 102, 102);
+    margin-bottom: .65rem;
+}
+
+.clock .time{
+    font-size: 4.5rem;
+}
+
+.clock .time > span{
+    font-size: 4rem;
+    padding: .3rem;
+    border-radius: 4px;
+}
+
+.clock .time > span{
+    background-color: rgb(61, 61, 61);
+    color: white;
+}
+
+.clock .time > span:last-child{
+    background-color: rgb(226, 226, 226);
+    color: rgb(58, 58, 58);
+}
