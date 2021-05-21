@@ -27,5 +27,7 @@
     </div>
 </div>
 
+<?php include('btnRespaldo.html'); ?>
+
 <script src="resources/js/asiste.js"></script>
 <script src="resources/js/preview.js"></script>

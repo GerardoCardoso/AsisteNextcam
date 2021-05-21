@@ -4,6 +4,7 @@ body{
 
 .lockscreen-item{
     background: transparent;
+    margin-bottom: 1rem !important;
 }
 
 #asiste-usuario{
@@ -13,7 +14,7 @@ body{
 }
 
 input[name="codigopersona"]{
-    font-size: 135%;
+    font-size: 100%;
     font-weight: 600;
     letter-spacing: 4px;
 }
@@ -54,7 +55,8 @@ input[type=number] {
 .mini-footer{
     position: absolute;
     bottom:0;
-    width:298px;
+    width:298px !important;
+    font-size: 93% !important;
     margin-left: auto;
     margin-right: auto;
     left:0;

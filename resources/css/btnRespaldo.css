@@ -1,0 +1,29 @@
+#contenedor-respaldo{
+    position: absolute;
+    left:0;
+    bottom:0;
+    padding-left:0.5rem;
+    padding-bottom:0.5rem;
+}
+
+#contenedor-respaldo #btn-respaldo{
+    position: relative;
+    border: 0;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    cursor: pointer;
+    background-color: #3c8dbc;
+    border-radius: 3px;
+    outline: none;
+}
+
+#contenedor-respaldo #btn-respaldo:active{
+    background-color: #367fa9;
+}
+
+#contenedor-respaldo #btn-respaldo i{
+    color: white;
+    font-size:94%;
+}
