@@ -44,56 +44,74 @@
         mysqli_query($conexion, "SET NAMES utf8");
     }
 
-    function procesoRespaldo($yesterdayDate, $remoteConexion){
-        
-        global $conexion;
-
+    function procesoRespaldo($yesterdayDate, $conexion, $remoteConexion){
         date_default_timezone_set('America/Mexico_City');
         $horaActual= date("H");
 
         if(intval($horaActual) > 8 && intval($horaActual) <= 23){
-            $remoteQuery= "SELECT COUNT(*) AS SI_HAY FROM asistencia WHERE fecha='$yesterdayDate' ORDER BY idasistencia DESC";
+            $remoteQuery= "SELECT * FROM asistencia WHERE fecha='$yesterdayDate' ORDER BY idasistencia DESC";
             
             $result= mysqli_query($remoteConexion, $remoteQuery);
-            $row= mysqli_fetch_array($result);
+            $countRows= intval(mysqli_num_rows($result));
             
             // Si no hay registros del dia anterior en la bd remota. Transferir todos los registros..
-            if(intval($row['SI_HAY']) == 0){
-                // Realizar una consulta con todas las asistencias del dia anterior en la bd local.
+            if($countRows < 1){
+                echo "<script>console.log('3. No se encontraron asistencias en la base de datos (remota) del $yesterdayDate. Se elaborará a continuación un respaldo.')</script>";
+                // Realizar una consulta con todas las asistencias del dia anterior en la bd (local).
                 $localQuery= "SELECT * FROM asistencia WHERE fecha='$yesterdayDate'";
                 $result2= mysqli_query($conexion, $localQuery);
                 
-                // Si hay registros en la base de datos local..
-                if(!empty($localRows)){
+                // Si hay registros en la base de datos (local)..
+                if(intval(mysqli_num_rows($result2)) > 0){
+                    echo "<script>console.log('4. Se encontraron asistencias en la base de datos (local) del día $yesterdayDate. Se iniciará el proceso de respaldo.')</script>";
+                    $insertedRows=0;
                     $allRight= true;
-                    while($lr= mysqli_fetch_array($result2)){
-                        $remoteQuery= "INSERT INTO asistencia (codigo_persona, fecha_hora, tipo, fecha) VALUES ('$lr[codigo_persona]','$lr[fecha_hora]','$lr[tipo]','$lr[fecha]')";
-                        if(!(mysqli_query($remoteConexion, $remoteQuery))){
+
+                    while($row= mysqli_fetch_array($result2)){
+                        $remoteQuery= "INSERT INTO asistencia (codigo_persona, fecha_hora, tipo, fecha) VALUES ('$row[codigo_persona]','$row[fecha_hora]','$row[tipo]','$row[fecha]')";
+                        if(mysqli_query($remoteConexion, $remoteQuery)){
+                            $allRight= true;
+                        }else{
                             $allRight= false;
                             break;
                         }
+
+                        $insertedRows++;
                     }
 
                     if(!$allRight){
-                        die("Hubo un error al transferir una asistencia local a la base de datos remota.. query => ".$remoteQuery." mysql_error => ".mysqli_error($remoteConexion));
+                        $text= "Hubo un error al transferir una asistencia local a la base de datos remota.. query => ".$remoteQuery." mysql_error => ".mysqli_error($remoteConexion);
+                        echo "<script>console.warn('3. $text')</script>";
+                    }else{
+                        if($insertedRows > 0){
+                            echo "<script>console.log('5. Se elaboró un respaldo de asistencias del $yesterdayDate exitosamente.')</script>";
+                        }
+                        if($insertedRows == 0){
+                            echo "<script>console.log('5. No hubo asistencias que respaldar del $yesterdayDate.')</script>";
+                        }
                     }
                 }else{
-                    exit;
+                    echo "<script>console.warn('4. No hay asistencias en la base de datos (local) del día $yesterdayDate. Por lo tanto no se pudo realizar un proceso de respaldo.')</script>";
                 }
+            }else{
+                echo "<script>console.log('3. Ya se encuentran respaldadas las asistencias del $yesterdayDate en la base de datos (remota).')</script>";
             }
             
+            mysqli_close($conexion);
             mysqli_close($remoteConexion);
         }
     }
 
     function respaldarAsistencias(){
+        date_default_timezone_set('America/Mexico_City');
         global $localHost;
 
         if(strtolower($localHost) == "localhost" || $localHost == "127.0.0.1"){
             global $conexion;
+            global $localDB;
 
-            if($conexion != null || !empty($conexion)){
-                date_default_timezone_set('America/Mexico_City');
+            if($conexion->ping()){
+                echo "<script>console.log('1. Se estableció conexión con la base de datos (local). $localDB')</script>";
                 
                 /**
                  *  Variables Remotas: Base de Datos
@@ -106,26 +124,29 @@
 
                 $remoteConexion= new mysqli($remoteHost, $remoteUser, $remotePass, $remoteDB);
 
-                if($remoteConexion != null || !empty($remoteConexion)){
-
+                if($remoteConexion->ping()){
+                    echo "<script>console.log('2. Se estableció conexión con la base de datos (remota). $remoteDB')</script>";
                     // Pregunto si el dia actual es lunes
-                    if(strtolower(date("l")) == "monday"){
+                    if(mb_strtolower(date("l")) == "monday"){
                         // Hacer el respaldo del sábado
                         $yesterdayDate = date('Y-m-d',strtotime("-2 days"));
-                        procesoRespaldo($yesterdayDate, $remoteConexion);
+                        procesoRespaldo($yesterdayDate, $conexion, $remoteConexion);
                     }else{
                         // Hacer el respaldo del día anterior
                         $yesterdayDate = date('Y-m-d',strtotime("-1 days"));
-                        procesoRespaldo($yesterdayDate, $remoteConexion);
+                        procesoRespaldo($yesterdayDate, $conexion, $remoteConexion);
                     }
                 }else{
-                    die("No se pudo establecer conexion con la base de datos remota..");
+                    echo "<script>console.warn('No se pudo establecer conexion con la base de datos remota. $remoteDB')</script>";
+                    exit;
                 }
             }else{
-                die("No se pudo establecer conexion con la base de datos local..");
+                echo "<script>console.warn('No se pudo establecer conexion con la base de datos local. $localDB')</script>";
+                exit;
             }
-        }else{
-            die("No se puede crear un resplado de asistencias debido a que el host principal no es local..");
+        }else{            
+            echo "<script>console.warn('No se puede crear un respaldo de asistencias debido a que el host principal no es local.')</script>";
+            exit;
         }
     }
 ?>
