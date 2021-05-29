@@ -39,7 +39,7 @@
         ?>
         
         <div class="mini-footer">
-            <small>© Copyright Nextcam <?=date("Y")?>. Todos los derechos reservados.</small>
+            <small>© Copyright Nextcam <?=date("Y")?>. Todos los derechos reservados. v290521</small>
         </div>
     </body>
 </html>
