@@ -8,28 +8,28 @@
 <div class="modal fade" id="respaldoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">
-                <i class="fa fa-database"></i>
-                Respaldar Asistencias
-            </h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        <div class="modal-body">
-            <form method="POST" id="formulario-respaldo" action="controller/respaldarAsistencias.php">
-                <div class="form-group">
-                    <label class="label">Fecha de Preferencia</label>
-                    <input class="form-control" id="fechaReferencia" type="date">
-                    <small> La fecha servirá de referencia para generar el respaldo de asistencias.</small>
-                </div>
-            </form>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-            <button type="button" class="btn btn-primary" onclick="$('#formulario-respaldo').submit()">Generar Respaldo</button>
-        </div>
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">
+                    <i class="fa fa-database"></i>
+                    Respaldar Asistencias
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" id="formulario-respaldo" action="controller/respaldarAsistencias.php">
+                    <div class="form-group">
+                        <label class="label">Fecha de Preferencia</label>
+                        <input class="form-control" id="fechaReferencia" type="date">
+                        <small> La fecha servirá de referencia para generar el respaldo de asistencias.</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="$('#formulario-respaldo').submit()">Generar Respaldo</button>
+            </div>
         </div>
     </div>
 </div>
@@ -45,6 +45,7 @@
             type: 'POST',
             data: {fechaReferencia: fr}
         }).done(function(response){
+            console.log(response);
             try{
                 response= JSON.parse(response);
             }catch(exception){}

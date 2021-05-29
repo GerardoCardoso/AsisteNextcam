@@ -12,7 +12,7 @@
         }
     
         public function seleccionarcodigo_persona($codigo_persona){
-            $this->query = "SELECT tipo FROM asistencia WHERE codigo_persona = '$codigo_persona' ORDER BY fecha_hora DESC LIMIT 1";
+            $this->query = "SELECT tipo, fecha FROM asistencia WHERE codigo_persona = '$codigo_persona' ORDER BY fecha_hora DESC LIMIT 1";
             return ejecutarConsulta($this->query);
         }
     
