@@ -25,6 +25,14 @@
             "tipoMov" => "",
             "message" => "No hay empleado registrado con este código, Llama al administrador."
             );
+        
+        // Aplicar excepción a becario u otro personal.
+        $personalExcepcion= '000927018';
+        $entradaLimite= 13;
+        
+        if($personalExcepcion == $codigo_persona){
+            $entradaLimite= 16;
+        }
 
         if($result > 0){
             // La solicitud se procesó y el usuario existe.
@@ -38,7 +46,7 @@
 
             if(empty($tipo) || strtolower($tipo) == 'salida'){
                 // Validar si aun se puede registrar la entrada.
-                if($horaActual > 7 && $horaActual < 13){
+                if($horaActual > 7 && $horaActual < $entradaLimite){
                     if($asistencia->registrarMovimiento($codigo_persona,"Entrada",$fecha,$hora)){
                         $output["user"]["nombre"]= $result['nombre'];
                         $output["user"]["appaterno"]= $result['appaterno'];
