@@ -29,7 +29,6 @@ function registrar_asistencia(){
         try{
             response= JSON.parse(response);
         }catch(exception){}
-
         mostrarAlerta(response);
      });
 }

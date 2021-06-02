@@ -9,7 +9,9 @@
         $fecha= date("Y-m-d");
         $hora= date("H:i:s");
         $horaActual= intval(date("H"));
+
         $fechaActual= date("Y-m-d");
+        $fechaAyer= date("Y-m-d", strtotime("-1 days"));
         
         $codigo_persona= limpiarCadena($_POST["codigo_persona"]);
         $result= $asistencia->verificarcodigo_persona($codigo_persona);
@@ -64,30 +66,18 @@
                     $output["message"]= "El tiempo de registro de entrada no esta disponible.";
                 }
             }else{
-                // Preguntar si la fecha de Entrada es del día de hoy
-                if($result3['fecha'] == $fechaActual){
-                    // Si se va a registrar la salida, verificar que la hora actual sea mayor o igual a la 1 de la tarde.
-                    if($horaActual >= 13){
-                        // Validar si aun se puede registrar la salida.
-                        if($asistencia->registrarMovimiento($codigo_persona,"Salida",$fecha,$hora)){
-                            $output["user"]["nombre"]= $result['nombre'];
-                            $output["user"]["appaterno"]= $result['appaterno'];
-                            $output["user"]["amaterno"]= $result['amaterno'];
-                            $output["movHora"]= $hora;
-                            $output["tipoMov"]= "salida";
-                        }else{
-                            // No se pudo registrar la salida.
-                            $output["success"]= false;
-                            $output["tipoMov"]= "salida";
-                        }
-                    }else{
-                        $output["success"]= false;
-                        $output["tipoMov"]= "salida";
-                        $output["message"]= "El tiempo de registro de salida no esta disponible.";
-                    }
-                }else{
-                    // Registrar la salida con la fecha de ayer con la hora máxima admitida (11:00pm)
-                    if($asistencia->registrarMovimiento($codigo_persona,"Salida",$result3['fecha'],"23:00:00")){
+                // Verificar si no hay una entrada del dia de ayer en la bd, si no hay, registrarla con hora máximo a las 11:00pm.
+                $query= "SELECT * FROM asistencia WHERE codigo_persona='$codigo_persona' AND tipo='Salida' AND fecha='$fechaAyer'";
+                $response= ejecutarConsulta($query);
+
+                if(intval(mysqli_num_rows($response)) < 1){
+                    $asistencia->registrarMovimiento($codigo_persona,"Salida",$fechaAyer,"23:00:00");
+                }
+
+                // Si se va a registrar la salida del día de hoy, verificar que la hora actual sea mayor o igual a la 1 de la tarde.
+                if($horaActual >= 13){
+                    // Validar si aun se puede registrar la salida.
+                    if($asistencia->registrarMovimiento($codigo_persona,"Salida",$fecha,$hora)){
                         $output["user"]["nombre"]= $result['nombre'];
                         $output["user"]["appaterno"]= $result['appaterno'];
                         $output["user"]["amaterno"]= $result['amaterno'];
@@ -98,6 +88,10 @@
                         $output["success"]= false;
                         $output["tipoMov"]= "salida";
                     }
+                }else{
+                    $output["success"]= false;
+                    $output["tipoMov"]= "salida";
+                    $output["message"]= "El tiempo de registro de salida no esta disponible.";
                 }
             }
         }
